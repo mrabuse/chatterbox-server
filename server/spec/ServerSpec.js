@@ -78,7 +78,10 @@ describe('Node Server Request Listener Function', function() {
   it('Should respond with messages that were previously posted', function() {
     var stubMsg = {
       username: 'Jono',
-      message: 'Do my bidding!'
+      message: 'Do my bidding!',
+      roomname: 'lobby',
+      objectId: Math.random() * 100,
+      createdAt: new Date()
     };
     var req = new stubs.request('/classes/messages', 'POST', stubMsg);
     var res = new stubs.response();
