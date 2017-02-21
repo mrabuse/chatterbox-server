@@ -26,7 +26,7 @@ var app = {
     app.$roomSelect.on('change', app.handleRoomChange);
 
     // Fetch previous messages
-    app.startSpinner();
+    // app.startSpinner();
     app.fetch(false);
 
     // Poll for new messages
@@ -42,7 +42,8 @@ var app = {
     $.ajax({
       url: app.server,
       type: 'POST',
-      data: message,
+      contextType: 'application/json',
+      data: JSON.stringify(message),
       success: function (data) {
         // Clear messages input
         app.$message.val('');
@@ -66,12 +67,12 @@ var app = {
       contentType: 'application/json',
       success: function(data) {
         // Don't bother if we have nothing to work with
-        console.log(data);
+        data = JSON.parse(data);
         if (!data.results || !data.results.length) { return; }
 
         // Store messages for caching later
         app.messages = data.results;
-
+        console.log('results', data.results);
         // Get the last message
         var mostRecentMessage = data.results[data.results.length - 1];
 
@@ -103,6 +104,7 @@ var app = {
     app.stopSpinner();
     if (Array.isArray(messages)) {
       // Add all fetched messages that are in our current room
+      messages = messages.reverse();
       messages
         .filter(function(message) {
           return message.roomname === app.roomname ||
@@ -218,10 +220,12 @@ var app = {
     var message = {
       username: app.username,
       text: app.$message.val(),
-      roomname: app.roomname || 'lobby'
+      roomname: app.roomname || 'lobby',
+      objectId: Math.random() * 100,
+      createdAt: new Date()
     };
 
-    // app.send(message);
+    app.send(message);
 
     // Stop the form from submitting
     event.preventDefault();
