@@ -49,23 +49,22 @@ var requestHandler = function(request, response) {
   console.log('Serving request type ' + request.method + ' for url ' + request.url);
 
   var statusCode = 200;
+  
+  var pathname = request.url.substring(0, 17);
 
-  if (request.url !== '/classes/messages') {
+  if (pathname !== '/classes/messages') {
     statusCode = 404;
   }
 
   if (request.method === 'POST') {
     statusCode = 201;
+
     request.on('data', function(chunk) {
       var chunk = JSON.parse(chunk.toString());
       data.results.push(chunk);
-      console.log('DATA OBJ', data);
     });
   }
 
-  if (request.method === 'GET') {
-
-  }
 
   // The outgoing status.
  
@@ -81,10 +80,6 @@ var requestHandler = function(request, response) {
   // .writeHead() writes to the request line and headers of the response,
   // which includes the status and all headers.
   response.writeHead(statusCode, headers);
-  
-
-
-
 
   // Make sure to always call response.end() - Node may not send
   // anything back to the client until you do. The string you pass to
@@ -93,7 +88,13 @@ var requestHandler = function(request, response) {
   //
   // Calling .end "flushes" the response's internal buffer, forcing
   // node to actually send all the data over to the client.
-  response.end(JSON.stringify(data));
+
+  if (request.method === 'OPTIONS') {
+    console.log('OPTIONS SUCCESS');
+    response.end();
+  } else {
+    response.end(JSON.stringify(data));    
+  }
 };
 
 
